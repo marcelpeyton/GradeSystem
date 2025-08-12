@@ -2,6 +2,8 @@ package org.example.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DatabaseConnection {
     private static DatabaseConnection instance;
@@ -15,9 +17,25 @@ public class DatabaseConnection {
     private DatabaseConnection(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
+            this.connection = DriverManager.getConnection(URL,USER,PASSWORD);
         }
-        catch(){
+        catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static DatabaseConnection getInstance(){
+        if(instance == null){
+            synchronized (DatabaseConnection.class){
+                if(instance == null){
+                    instance = new DatabaseConnection();
+                }
+            }
         }
+        return instance;
+    }
+
+    public Connection getConnection(){
+        return connection;
     }
 }
